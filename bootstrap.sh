@@ -363,7 +363,7 @@ function build_gcc {
   pushd "${BUILD_DIR}"
   mkdir_empty "${GCC}"
   cd "${GCC}"
-  "${SOURCES}/${GCC}/configure" \
+  CC="${CC} -std=gnu89" "${SOURCES}/${GCC}/configure" \
     --prefix="${PREFIX}" \
     --target="m68k-amigaos" \
     --enable-languages=c \
@@ -384,7 +384,7 @@ function build_gpp {
   pushd "${BUILD_DIR}"
   mkdir_empty "${GPP}"
   cd "${GPP}"
-  "${SOURCES}/${GCC}/configure" \
+  CC="${CC} -std=gnu89" "${SOURCES}/${GCC}/configure" \
     --prefix="${PREFIX}" \
     --target="m68k-amigaos" \
     --enable-languages=c++ \
@@ -466,7 +466,7 @@ function build_libnix {
     --prefix="${PREFIX}" \
     --host="i686-linux-gnu" \
     --target="m68k-amigaos"
-  make all \
+  ${MAKE} all \
     CC=m68k-amigaos-gcc \
     CPP="m68k-amigaos-gcc -E" \
     AR=m68k-amigaos-ar \
