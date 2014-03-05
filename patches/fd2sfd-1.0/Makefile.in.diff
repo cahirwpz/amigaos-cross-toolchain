@@ -1,9 +1,14 @@
---- fd2sfd-1.0/Makefile.in.orig	2014-01-02 21:21:41.000000000 +0100
-+++ fd2sfd-1.0/Makefile.in	2014-01-02 21:23:12.000000000 +0100
-@@ -45,45 +45,6 @@
- 	  $(INSTALL_DATA) -D $(srcdir)/cross/share/$${f} $(fd2sfddir)/$${f}; \
- 	done
+--- fd2sfd-1.0/Makefile.in	2003-07-31 08:10:19.000000000 +0200
++++ fd2sfd-1.0/Makefile.in	2014-03-05 12:09:10.000000000 +0100
+@@ -40,49 +40,13 @@
  
+ 	# Install tools
+ 	$(INSTALL_PROGRAM) $(EXECUTABLE) $(bindir)
+-	$(INSTALL_PROGRAM) cross/bin/gg-fix-includes $(bindir)
+-	for f in `cd $(srcdir)/cross/share/ && find * -type f`; do \
+-	  $(INSTALL_DATA) -D $(srcdir)/cross/share/$${f} $(fd2sfddir)/$${f}; \
+-	done
+-
 -	# Install example file structure for FDs
 -	$(INSTALL) -d $(prefix)/os-lib/fd/3rd
 -	$(INSTALL) -d $(prefix)/os-lib/fd/3rd-amigaos
@@ -32,7 +37,10 @@
 -		   prefs reaction resources rexx \
 -		   utility workbench; do \
 -	  $(INSTALL) -d $(prefix)/os-include/amigaos/$${dir}; \
--	done
++	$(INSTALL) -m 0755 cross/bin/gg-fix-includes $(bindir)
++	for d in `cd $(srcdir)/cross/share/ && find * -type d`; do \
++	  $(INSTALL) -d $(fd2sfddir)/$${d}; \
+ 	done
 -
 -	for dir in classes clib cybergraphx datatypes devices diskfont dos \
 -		   emul exec gadgets graphics guigfx hardware images \
@@ -40,9 +48,10 @@
 -		   prefs reaction render resources rexx \
 -		   utility workbench; do \
 -	  $(INSTALL) -d $(prefix)/os-include/morphos/$${dir}; \
--	done
++	for f in `cd $(srcdir)/cross/share/ && find * -type f`; do \
++	  $(INSTALL_DATA) $(srcdir)/cross/share/$${f} $(fd2sfddir)/$${f}; \
+ 	done
 -	$(INSTALL_DATA) $(srcdir)/README.os-include $(prefix)/os-include/README
--
+ 
  tgz:		all gg-fd2sfd.spec
  	cd $(srcdir) && cvs diff >/dev/null || (echo "Not checked in!"; exit 10)
- 	mkdir $(EXECUTABLE)-$(VERSION)
