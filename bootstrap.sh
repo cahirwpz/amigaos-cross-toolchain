@@ -141,6 +141,9 @@ function unpack_sources {
 
   unpack_clean "${VLINK}" "${VLINK_SRC}"
   mv "vlink" "${VLINK}"
+  pushd "${VLINK}"
+  mkdir objects
+  popd
 
   unpack_clean "${VBCC}" "${VBCC_SRC}"
   mv "vbcc" "${VBCC}"
