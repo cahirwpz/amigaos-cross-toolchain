@@ -63,6 +63,8 @@ You have to have following packages installed in your system:
  * lha
  * perl 5.10
  * libncurses5-dev **32-bit version!**
+ * patch
+ * yacc
 
 *For MacOSX users*: you'll likely need to have [MacPorts](http://www.macports.org) or [Homebrew](http://brew.sh) installed in order to build the toolchain.
 
