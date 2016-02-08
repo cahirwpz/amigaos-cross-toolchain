@@ -248,7 +248,7 @@ def build():
   required headers/libraries are present.
   """
 
-  require_header('ncurses.h', 'c', 'libncurses-dev 5.x missing', 'NCURSES_VERSION_MAJOR', 5)
+  require_header('ncurses.h', 'c', 'libncurses-dev 6.x missing', 'NCURSES_VERSION_MAJOR', 6)
 
   unpack('{m4}')
   configure('{m4}', '--prefix={host}')

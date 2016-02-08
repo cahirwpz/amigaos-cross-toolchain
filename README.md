@@ -66,7 +66,7 @@ AmigaOS specific documents:
 You have to have following packages installed in your system:
 
  * GNU gcc 4.x **32-bit version!** or Clang
- * libncurses5-dev **32-bit version!**
+ * libncurses6-dev **32-bit version!**
  * GNU make
  * python-dev
  * perl
