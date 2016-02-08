@@ -22,6 +22,7 @@ URLS = \
    'ftp://ftp.gnu.org/gnu/binutils/binutils-2.9.1.tar.gz',
    'ftp://ftp.gnu.org/gnu/gcc/gcc-2.95.3/gcc-core-2.95.3.tar.gz',
    'ftp://ftp.gnu.org/gnu/gcc/gcc-2.95.3/gcc-g++-2.95.3.tar.gz',
+   'ftp://ftp.gnu.org/gnu/ncurses/ncurses-5.9.tar.gz',
    ('http://fossies.org/linux/misc/old/flex-2.5.4a.tar.gz',
     'flex-2.5.4.tar.gz'),
    'git://github.com/cahirwpz/libnix',
@@ -248,8 +249,6 @@ def build():
   required headers/libraries are present.
   """
 
-  require_header('ncurses.h', 'c', 'libncurses-dev 5.x missing', 'NCURSES_VERSION_MAJOR', 5)
-
   unpack('{m4}')
   configure('{m4}', '--prefix={host}')
   make('{m4}')
@@ -279,6 +278,13 @@ def build():
   configure('{autoconf}', '--prefix={host}')
   make('{autoconf}')
   make('{autoconf}', 'install')
+  
+  unpack('{ncurses}')
+  configure('{ncurses}', '--prefix={host}')
+  make('{ncurses}')
+  make('{ncurses}', 'install')
+  
+  require_header('ncurses.h', 'c', 'libncurses-dev 5.x missing', 'NCURSES_VERSION_MAJOR', 5)
 
   prepare_target()
 
@@ -597,6 +603,7 @@ if __name__ == "__main__":
          gcc_gpp='gcc-g++-{gcc_ver}',
          gcc='gcc-{gcc_ver}',
          gpp='g++-{gcc_ver}',
+         ncurses='ncurses-5.9',
          patches=path.join('{top}', 'patches'),
          stamps=path.join('{top}', '.build-m68k', 'stamps'),
          build=path.join('{top}', '.build-m68k', 'build'),
