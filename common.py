@@ -299,6 +299,14 @@ def add_site_dir(dirname):
   site.addsitedir(dirname)
 
 
+@fill_in_args
+def add_site_dir64(dirname):
+  dirname = path.join(dirname, 'lib64', 'python%d.%d' % sys.version_info[:2],
+                      'site-packages')
+  info('adding "%s" to python site dirs', topdir(dirname))
+  site.addsitedir(dirname)
+
+
 @contextlib.contextmanager
 def cwd(name):
   old = os.getcwd()
@@ -484,5 +492,5 @@ def require_header(header, lang, msg='', symbol=None, value=None):
 __all__ = ['setvar', 'panic', 'cmpver', 'find_executable', 'chmod', 'execute',
            'rmtree', 'mkdir', 'copy', 'copytree', 'unarc', 'fetch', 'cwd',
            'symlink', 'remove', 'move', 'find', 'textfile', 'env', 'path',
-           'add_site_dir', 'python_setup', 'recipe', 'unpack', 'patch',
-           'configure', 'make', 'require_header']
+           'add_site_dir', 'add_site_dir64', 'python_setup', 'recipe', 'unpack',
+           'patch', 'configure', 'make', 'require_header']

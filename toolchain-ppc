@@ -70,6 +70,8 @@ def build():
                               environ['PATH']])
 
   add_site_dir('{host}')
+  if platform.machine() == 'x86_64':
+    add_site_dir64('{host}')
 
   with cwd('{archives}'):
     for url in URLS:

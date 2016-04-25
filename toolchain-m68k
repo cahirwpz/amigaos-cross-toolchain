@@ -206,6 +206,8 @@ def build():
       fetch(name, url)
 
   add_site_dir('{host}')
+  if platform.machine() == 'x86_64':
+    add_site_dir64('{host}')
 
   """
   Make sure we always choose known compiler (from the distro) and not one in
@@ -278,7 +280,8 @@ def build():
   make('{bison}', 'install')
 
   unpack('{texinfo}')
-  configure('{texinfo}', '--prefix={host}')
+  with env(CC=CC, CXX=CXX):
+    configure('{texinfo}', '--prefix={host}')
   make('{texinfo}')
   make('{texinfo}', 'install')
 
@@ -544,6 +547,8 @@ def install_sdk(*names):
                               environ['PATH']])
 
   add_site_dir('{host}')
+  if platform.machine() == 'x86_64':
+    add_site_dir64('{host}')
 
   for name in names:
     filename = path.join('{top}/sdk', name + '.sdk')
