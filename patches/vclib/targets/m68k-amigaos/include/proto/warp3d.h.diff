@@ -1,0 +1,11 @@
+--- vclib/targets/m68k-amigaos/include/proto/warp3d.h~	2016-02-06 00:00:00.000000000 +0200
++++ vclib/targets/m68k-amigaos/include/proto/warp3d.h	2016-06-27 11:01:10.000000000 +0300
+@@ -5,7 +5,7 @@
+ #include <exec/types.h>
+ #endif
+ #if !defined(CLIB_WARP3D_PROTOS_H) && !defined(__GNUC__)
+-#include <clib/warp3d_protos.h>
++#include <clib/Warp3D_protos.h>
+ #endif
+ 
+ #ifndef __NOLIBBASE__
