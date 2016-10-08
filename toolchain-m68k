@@ -315,6 +315,7 @@ def build():
   build_vbcc()
 
   unpack('vclib', top_dir='vbcc_target_m68k-amigaos')
+  patch('vclib')
 
   install_vbcc_toolchain()
 
