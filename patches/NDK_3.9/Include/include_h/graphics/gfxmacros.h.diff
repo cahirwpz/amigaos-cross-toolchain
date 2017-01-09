@@ -1,22 +1,20 @@
---- NDK_3.9/Include/include_h/graphics/gfxmacros.h.orig	2017-01-09 14:37:17.040582249 +0100
-+++ NDK_3.9/Include/include_h/graphics/gfxmacros.h	2017-01-09 14:37:32.084233042 +0100
-@@ -55,9 +55,6 @@
- #define SafeSetOutlinePen(w,c)	  {if (GfxBase->LibNode.lib_Version<39) { (w)->AOlPen = c;(w)->Flags |= AREAOUTLINE;} else SetOutlinePen(w,c); }
+--- NDK_3.9/Include/include_h/graphics/gfxmacros.h.orig	2017-01-09 22:05:16.180477595 +0100
++++ NDK_3.9/Include/include_h/graphics/gfxmacros.h	2017-01-09 22:06:45.054452637 +0100
+@@ -56,7 +56,7 @@
  #define SafeSetWriteMask(w,m)	{if (GfxBase->LibNode.lib_Version<39) { (w)->Mask = (m);} else SetWriteMask(w,m); }
  
--/* synonym for GetOPen for consistency with SetOutlinePen */
+ /* synonym for GetOPen for consistency with SetOutlinePen */
 -#define GetOutlinePen(rp) GetOPen(rp)
--
++#define GetOPen(rp) GetOutlinePen(rp)
+ 
  #define BNDRYOFF(w)	{(w)->Flags &= ~AREAOUTLINE;}
  
- #define CINIT(c,n)	  UCopperListInit(c,n);
-@@ -116,9 +113,6 @@
- 						SetWriteMask(w,m); \
+@@ -117,7 +117,7 @@
  				} while (0)
  
--/* synonym for GetOPen for consistency with SetOutlinePen */
+ /* synonym for GetOPen for consistency with SetOutlinePen */
 -#define GetOutlinePen(rp) GetOPen(rp)
--
++#define GetOPen(rp) GetOutlinePen(rp)
+ 
  
  #define BNDRYOFF(w)	do { \
- 				(w)->Flags &= ~AREAOUTLINE; \
