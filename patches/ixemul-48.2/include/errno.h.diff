@@ -1,0 +1,14 @@
+--- ixemul-48.2.orig/include/errno.h	2017-02-12 17:02:02.830802000 +0100
++++ ixemul-48.2/include/errno.h	2017-02-11 20:48:30.301194200 +0100
+***************
+*** 153,158 ****
+--- 153,161 ----
+  
+  #define	EFTYPE		79		/* Inappropriate file type or format */
+  
++ #define EILSEQ		80		/* illegal_byte_sequence */
++ #define ENOMSG		81		/* no_message */
++ 
+  #ifdef _KERNEL
+  /* pseudo-errors returned inside kernel to modify return to process */
+  #define	ERESTART	-1		/* restart syscall */

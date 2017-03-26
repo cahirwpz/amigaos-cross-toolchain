@@ -1,0 +1,47 @@
+--- ixemul-48.2.orig/include/signal.h	2017-02-12 17:02:02.830802000 +0100
++++ ixemul-48.2/include/signal.h	2017-02-11 20:48:30.301194200 +0100
+@@ -59,17 +59,24 @@
+ #ifndef	_ANSI_SOURCE
+ int	kill __P((pid_t, int));
+ int	sigaction __P((int, const struct sigaction *, struct sigaction *));
++#if defined(__GNUC__) && defined(__STDC__)
++#ifdef __EXTERN_INLINE__
+ int	sigaddset __P((sigset_t *, int));
+ int	sigdelset __P((sigset_t *, int));
++int	sigismember __P((const sigset_t *, int));
++#endif
++#endif
+ int	sigemptyset __P((sigset_t *));
+ int	sigfillset __P((sigset_t *));
+-int	sigismember __P((const sigset_t *, int));
+ int	sigpending __P((sigset_t *));
+ int	sigprocmask __P((int, const sigset_t *, sigset_t *));
+ int	sigsuspend __P((const sigset_t *));
+ 
+ #if defined(__GNUC__) && defined(__STDC__)
+-extern __inline int sigaddset(sigset_t *set, int signo) {
++#ifndef __EXTERN_INLINE__
++#define __EXTERN_INLINE__ static inline
++#endif
++__EXTERN_INLINE__ int sigaddset(sigset_t *set, int signo) {
+ 	extern int errno;
+ 
+ 	if (signo <= 0 || signo >= _NSIG) {
+@@ -80,7 +87,7 @@
+ 	return (0);
+ }
+ 
+-extern __inline int sigdelset(sigset_t *set, int signo) {
++__EXTERN_INLINE__ int sigdelset(sigset_t *set, int signo) {
+ 	extern int errno;
+ 
+ 	if (signo <= 0 || signo >= _NSIG) {
+@@ -91,7 +98,7 @@
+ 	return (0);
+ }
+ 
+-extern __inline int sigismember(const sigset_t *set, int signo) {
++__EXTERN_INLINE__ int sigismember(const sigset_t *set, int signo) {
+ 	extern int errno;
+ 
+ 	if (signo <= 0 || signo >= _NSIG) {

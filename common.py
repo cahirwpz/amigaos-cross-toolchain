@@ -7,6 +7,7 @@ from os import path
 import contextlib
 from distutils import spawn, sysconfig
 import os
+import datetime
 import shutil
 import site
 import subprocess
@@ -351,6 +352,7 @@ def recipe(name, nargs=0):
       target = target.replace('_', '-')
       target = target.replace('/', '-')
       stamp = path.join('{stamps}', target)
+
       if not path.exists('{stamps}'):
         mkdir('{stamps}')
       if not path.exists(stamp):
@@ -420,6 +422,44 @@ def unpack(name, work_dir='{sources}', top_dir=None, dst_dir=None):
     copytree(path.join(tmpdir, top_dir or name), dst)
     rmtree(tmpdir)
 
+def removemodule(name):
+  mbuild = path.join('{build}', name)
+  info('removing build for module %s : "%s"', name, mbuild)
+  
+  mstamp = path.join('{stamps}', name + '-*')
+  for f in glob(mstamp):
+    remove(f)
+    
+  rmtree(mbuild)
+
+def checkstamps(name):
+  target = fill_in(name)
+  target = target.replace('_', '-')
+  target = target.replace('/', '-')
+  if not path.exists('{stamps}'):
+    mkdir('{stamps}')
+  stamp = path.join('{stamps}', target + '-make')
+  info('checking %s with %s', name, stamp)
+  mtime = 0       
+  if path.exists(stamp):
+    mtime = os.stat(stamp).st_mtime
+    
+  ins = None
+  for n in find('{stamps}', include=[target + '*install*']):
+    ins = n
+    break
+  if ins == None:
+    remove(stamp)
+
+  submodule = path.join('submodules/', name)
+  for root, dirs, files in os.walk(submodule):
+    for filename in files:
+      mf = os.path.join(root, filename)
+      mt = os.stat(mf).st_mtime
+      if mt > mtime:
+        touch(stamp)
+        return True
+  return False
 
 @recipe('patch', 1)
 def patch(name, work_dir='{sources}'):
@@ -458,7 +498,7 @@ def make(name, target=None, makefile=None, **makevars):
   info('running make "%s"', target)
 
   with cwd(path.join('{build}', name)):
-    args = ['%s=%s' % item for item in makevars.items()]
+    args = ['%s=%s' % item for item in makevars.items()] + ['-j{numThreads}']
     if target is not None:
       args = [target] + args
     if makefile is not None:
@@ -496,8 +536,9 @@ def require_header(headers, lang='c', errmsg='', symbol=None, value=None):
   panic(errmsg)
 
 
-__all__ = ['setvar', 'panic', 'cmpver', 'find_executable', 'chmod', 'execute',
+__all__ = ['setvar', 'fill_in', 'panic', 'cmpver', 'find_executable', 'chmod', 'execute',
            'rmtree', 'mkdir', 'copy', 'copytree', 'unarc', 'fetch', 'cwd',
            'symlink', 'remove', 'move', 'find', 'textfile', 'env', 'path',
            'add_site_dir', 'find_site_dir', 'python_setup', 'recipe',
-           'unpack', 'patch', 'configure', 'make', 'require_header', 'touch']
+           'unpack', 'patch', 'configure', 'make', 'require_header', 'touch',
+           'checkstamps', 'removemodule']

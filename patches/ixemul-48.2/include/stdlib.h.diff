@@ -1,0 +1,15 @@
+--- ixemul-48.2.orig/include/stdlib.h	2017-03-26 11:05:36.300503000 +0200
++++ ixemul-48.2/include/stdlib.h	2017-03-26 20:43:22.476974600 +0200
+***************
+*** 49,55 ****
+--- 49,58 ----
+  #endif
+  
+  #ifdef	_BSD_WCHAR_T_
++ #ifndef _WCHAR_T_
++ #define _WCHAR_T_
+  typedef	_BSD_WCHAR_T_	wchar_t;
++ #endif
+  #undef	_BSD_WCHAR_T_
+  #endif
+  

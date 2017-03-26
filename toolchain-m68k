@@ -6,6 +6,7 @@ from fnmatch import fnmatch
 from glob import glob
 from logging import info, getLogger
 from os import environ
+import os
 import argparse
 import logging
 import platform
@@ -47,6 +48,7 @@ MULTILIB = [('', []),
              ['-fbaserel', '-DSMALL_DATA', '-m68020', '-m68881']),
             ('libb32/libm020', ['-fbaserel32', '-DSMALL_DATA', '-m68020'])]
 
+
 from common import * # NOQA
 
 
@@ -83,12 +85,13 @@ def install_ndk():
     execute('sfdc', '--target=m68k-amigaos', '--mode=lvo',
             '--output={prefix}/{target}/ndk/include/lvo/%s_lib.i' % base, name)
 
+  copytree('{prefix}/{target}/ndk/include', '{prefix}/{target}/sys-include')
 
 @recipe('headers-install')
 def headers_install():
-  info('installing ixemul header files')
+  info('installing libnix + NDK header files')
 
-  copytree('{sources}/{ixemul}/include', '{prefix}/{target}/libnix/include')
+  copytree('submodules/libnix/sources/headers', '{prefix}/{target}/libnix/include')
 
 
 @recipe('fd2sfd-install')
@@ -232,15 +235,66 @@ def touch_genfiles(dst):
   regenerated. Otherwise it can cause weird errors later in the build process
   (e.g. in ldexp.c:560)
   """
-  for name in find(dst, include=['*.l', '*.y']):
+  for name in find(dst, include=['*.l', '*.y', '*.in', '*.ac']):
     basename = path.splitext(name)[0]
-    for c_file in glob(basename + '.c'):
-      touch(c_file)
-    for h_file in glob(basename + '.h'):
-      touch(h_file)
+    # do not touch files - reset the src file stamp instead!
+    os.utime(name, (1, 1))
 
+
+def download():
+  with cwd('{archives}'):
+    for url in URLS:
+      if type(url) == tuple:
+        url, name = url[0], url[1]
+      else:
+        name = path.basename(url)
+      fetch(name, url)
+
+def shallowCheckout(murl, mpath, mbranch):
+  if murl == None:
+    return
+
+  if path.exists(path.join(mpath, '.git')):
+    return 
+  
+  if mbranch == None:
+    execute('git', 'clone', murl, '--depth', '1', mpath)
+  else:
+    execute('git', 'clone', murl, '--depth', '1', '-b', mbranch, mpath) 
+
+def update():
+  execute('git', 'submodule', 'init');
+  
+  with open('.gitmodules') as f:
+    content = f.readlines()
+    
+  mpath = None
+  murl = None
+  mbranch = None
+
+  for x in content:
+    x = x.strip()
+    if x.startswith('['):
+      shallowCheckout(murl, mpath, mbranch)
+      mpath = None
+      murl = None
+      mbranch = None
+    elif x.startswith('url'):
+      murl = x.partition('=')[2].strip()
+    elif x.startswith('path'):
+      mpath = x.partition('=')[2].strip()
+    elif x.startswith('branch'):
+      mbranch = x.partition('=')[2].strip()
+       
+  execute('git', 'submodule', 'update');
 
 def build():
+  _build(True)
+
+def xbuild():
+  _build(False)
+
+def _build(pull):
   for var in environ.keys():
     if var not in ['_', 'LOGNAME', 'HOME', 'SHELL', 'TMPDIR', 'PWD']:
       del environ[var]
@@ -254,16 +308,9 @@ def build():
   environ['LANG'] = 'C'
   environ['TERM'] = 'xterm'
 
-  with cwd('{archives}'):
-    for url in URLS:
-      if type(url) == tuple:
-        url, name = url[0], url[1]
-      else:
-        name = path.basename(url)
-      fetch(name, url)
-
-  execute('git', 'submodule', 'init');
-  execute('git', 'submodule', 'update');
+  if pull:
+    download()
+    update()
 
   add_site_dir('{host}')
 
@@ -278,13 +325,15 @@ def build():
 
   CC = find_executable(CC)
   CXX = find_executable(CXX)
-  FLAGS = '-g -O2'
-
+  
+  FLAGS = os.path.expandvars('$FLAGS')
+  if FLAGS == '$FLAGS':
+    FLAGS = '-g'
   if getLogger().isEnabledFor(logging.DEBUG):
     FLAGS += ' -Wall'
   else:
     FLAGS += ' -w'
-    environ['MAKEFLAGS'] = '--silent'
+    environ['MAKEFLAGS'] = '--silent'  
 
   environ['CC'] = CC
   environ['CXX'] = CXX
@@ -298,6 +347,34 @@ def build():
   When we have a working compiler in our path, we shoule also check if the
   required programs, headers and libraries are present.
   """
+
+  if not args.nodeps:
+    if checkstamps('{binutils}'):
+      removemodule('{binutils}')
+    
+    if checkstamps('{gcc}'):
+        removemodule('{libnix}')
+        removemodule('{clib2}')
+        removemodule('{libdebug}')
+        removemodule('{libm}')
+        
+    if checkstamps('{libnix}'):
+      removemodule('{libnix}')
+      rmtree(path.join('{build}', '{gcc}', '{target}'))
+      for f in glob(path.join('{stamps}', '{gcc}' + '-make*')):
+        remove(f)
+      remove(path.join('{stamps}', 'headers-install'))
+    
+    if checkstamps('{clib2}'):
+      removemodule('{clib2}')
+    
+    if checkstamps('{libdebug}'):
+      removemodule('{libdebug}')
+    
+    if checkstamps('{libm}'):
+      removemodule('{libm}')
+      
+
 
   find_executable('perl')
   find_executable('pod2text')
@@ -332,8 +409,12 @@ def build():
 
   unpack('{flex}')
   configure('{flex}', '--prefix={host}')
+  # flex build is broken with multiple threads
+  nt = fill_in('{numThreads}')
+  setvar(numThreads='1')
   make('{flex}')
   make('{flex}', 'install')
+  setvar(numThreads=nt)
 
   unpack('{bison}')
   update_autotools('{sources}/{bison}/config')
@@ -400,7 +481,7 @@ def build():
   CXX = ' '.join([CXX, ARCH, '-std=gnu++11'])
 
   """
-  Older gcc compilers (i.e. 2.95.3 and 3.4.6) and binutils have to be tricked
+  Older gcc compilers (i.e. 2.95.3, 3.4.6) and binutils have to be tricked
   into thinking that they're being compiled on Linux IA-32 machine. Theirs
   config.guess script knows nothing about x86-64 or darwin.
   """
@@ -431,17 +512,16 @@ def build():
               '--host=i686-linux-gnu',
               '--build=i686-linux-gnu',
               '--target=m68k-amigaos',
-              '--enable-languages=c,c++',
+              '--enable-languages=c,c++,objc',
               '--enable-version-specific-runtime-libs',
+              '--disable-libssp',
               '--with-headers={sources}/{ixemul}/include',
               from_dir='{submodules}/{gcc}')
     touch_genfiles('{submodules}/{gcc}')
-    touch('{submodules}/{gcc}/gcc/c-parse.gperf')
-    touch('{submodules}/{gcc}/gcc/configure')
-    make('{gcc}', 'all-gcc',
-         MAKEINFO='makeinfo', CFLAGS_FOR_TARGET='-noixemul')
+    make('{gcc}', 'all-gcc', 
+         MAKEINFO='makeinfo', CFLAGS_FOR_TARGET='-noixemul -Ofast')
     make('{gcc}', 'install-gcc',
-         MAKEINFO='makeinfo', CFLAGS_FOR_TARGET='-noixemul')
+         MAKEINFO='makeinfo', CFLAGS_FOR_TARGET='-noixemul -Ofast')
 
   headers_install()
 
@@ -462,6 +542,10 @@ def build():
        LD='m68k-amigaos-ld')
   make('{libnix}', 'install')
 
+  with env(CC=CC, CXX=CXX, CFLAGS=FLAGS, CXXFLAGS=FLAGS):
+    make('{gcc}', 'all-target-libgcc', MAKEINFO='makeinfo', CFLAGS_FOR_TARGET='-noixemul -Ofast')
+    make('{gcc}', 'install-target-libgcc', MAKEINFO='makeinfo', CFLAGS_FOR_TARGET='-noixemul -Ofast')
+
   copy('{submodules}/{libnix}/sources/headers/stabs.h',
        '{prefix}/{target}/libnix/include')
 
@@ -480,7 +564,7 @@ def build():
   with env(CC='m68k-amigaos-gcc -noixemul',
            AR='m68k-amigaos-ar',
            RANLIB='m68k-amigaos-ranlib'):
-    touch('{submodules}/{libdebug}/configure')
+    touch_genfiles('{submodules}/{libdebug}')
     configure('{libdebug}',
               '--prefix={prefix}/{target}/libnix',
               '--host=m68k-amigaos',
@@ -617,6 +701,9 @@ def process_sdk(sdk, lib_name, files):
         info('stubs: "%s" -> "%s"', filename, c_file)
         execute('sfdc', '--quiet', '--target=m68k-amigaos', '--mode=autoopen',
                 '--output=' + c_file, filename)
+        # remove d0 from clobber since it's the return value, also remove __inline
+        execute('perl', '-pi', '-e', 's/: \\"d0\\",/:/g', c_file)
+        execute('perl', '-pi', '-e', 's/__inline//g', c_file)
         add_stubs(c_file)
       elif kind == 'lib':
         filename = f[1]
@@ -626,6 +713,9 @@ def process_sdk(sdk, lib_name, files):
         info('lib: %s -> %s', filename, c_file)
         execute('sfdc', '--quiet', '--target=m68k-amigaos', '--mode=stubs',
                 '--output=' + c_file, filename)
+        # remove d0 from clobber since it's the return value, also remove __inline
+        execute('perl', '-pi', '-e', 's/: \\"d0\\",/:/g', c_file)
+        execute('perl', '-pi', '-e', 's/__inline//g', c_file)
         add_lib(c_file, lib_file)
       elif kind == 'file':
         source = f[1]
@@ -694,6 +784,17 @@ def test():
     execute('make', 'clean')
     execute('make')
 
+def __help_actions():
+  print ('\n'
+        'build:       download, update and build the tool chain (use --threads n to speed up the build)\n'
+        'xbuild:      build the tool chain (use --threads n to speed up the build)\n'
+        'clean:       remove the build artifacts\n'
+        'update:      updates the submodules using git\n'
+        'download:    download the archives\n'
+        'list-sdk:    list the available sdks\n'
+        'install-sdk: install the specified sdk\n'
+        'test:        build the example files\n')
+
 
 if __name__ == "__main__":
   logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s')
@@ -708,25 +809,32 @@ if __name__ == "__main__":
   if platform.machine() not in ['i686', 'x86_64']:
     panic('Build on %s architecture not supported!', platform.machine())
 
+  if sys.argv[1] == '--help':
+    __help_actions()
+
   parser = argparse.ArgumentParser(description='Build cross toolchain.')
   parser.add_argument('action',
-                      choices=['build', 'list-sdk', 'install-sdk', 'clean',
-                               'test'],
-                      default='build', help='perform action')
+                      choices=['build', 'xbuild', 'list-sdk', 'install-sdk', 'clean',
+                               'test', 'update', 'download'],
+                      default='build', help='perform an action')
   parser.add_argument('args', metavar='ARGS', type=str, nargs='*',
                       help='action arguments')
-  parser.add_argument('--binutils', choices=['2.9.1', '2.14'], default='2.9.1',
+  parser.add_argument('--binutils', choices=['2.9.1', '2.14'], default='2.14',
                       help='desired binutils version')
-  parser.add_argument('--gcc', choices=['2.95.3'], default='2.95.3',
+  parser.add_argument('--gcc', choices=['2.95.3', '3.4.6', '6'], default='6',
                       help='desired gcc version')
   parser.add_argument('-q', '--quiet', action='store_true')
   parser.add_argument('--prefix', type=str, default=None,
                       help='installation directory')
+  parser.add_argument('--threads', type=str, default='1',
+                      help='number of threads for make')
+  parser.add_argument('--nodeps', action='store_true', help='disable dependency checking')
   args = parser.parse_args()
 
   setvar(top=path.abspath(path.dirname(sys.argv[0])),
          binutils_ver=args.binutils,
-         gcc_ver=args.gcc)
+         gcc_ver=args.gcc,
+         numThreads=args.threads)
 
   setvar(m4='m4-1.4.17',
          gawk='gawk-3.1.8',

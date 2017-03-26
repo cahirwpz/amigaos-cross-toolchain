@@ -1,28 +1,34 @@
-AmigaOS cross compiler for Linux / MacOSX / Windows
+AmigaOS cross compiler for Linux / Windows ( OSX not working atm)
 ===
 
-##### It took me countless hours to put this fragile software together. The time I can spend to develop this project is limited. If you want binary builds, better support for Windows or any other [feature](https://github.com/cahirwpz/amigaos-cross-toolchain/wiki/TODO), please incentivize me by leaving a tip. 
+**THIS IS A FORK OF https://github.com/cahirwpz/amigaos-cross-toolchain - great thanks to [Krystian Bacławski](mailto:krystian.baclawski@gmail.com) ** 
 
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=47CV5JMRW9BRA)
-[![Build Status](https://travis-ci.org/cahirwpz/amigaos-cross-toolchain.svg?branch=master)](https://travis-ci.org/cahirwpz/amigaos-cross-toolchain)
+### What's different here?
 
-**Author:** [Krystian Bacławski](mailto:krystian.baclawski@gmail.com)
+ * Main focus is getting gcc 6 to work,
+ * for AmigaOS with Motorola CPUs.
+ * I am testing with Windows Cygwin 32 bit and Linux 32 bit (e.g. Xubuntu, CentOS, ...).
+ * All other stuff might work or not and I neither know nor care about for now.
 
-**Short description:** Cross toolchain build script for AmigaOS m68k and ppc targets. Supported host platforms are Linux, MacOSX and Windows (with [MSYS2](https://msys2.github.io/)).
+**Author:** [Krystian Bacławski](mailto:krystian.baclawski@gmail.com) - check out https://github.com/cahirwpz/amigaos-cross-toolchain for a stable toolchain.
+
+**Contributor:** [Stefan "Bebbo" Franke](mailto:bebbo@bejy.net) - wasting my time with newer binutils and gcc 6.2.
 
 ### Overview
 
-**amigaos-cross-toolchain** project provides an easy way to build AmigaOS 3.x (m68k) and ppc AmigaOS 4.x (ppc) target toolchain in a Unix-like environment.
+**this fork of amigaos-cross-toolchain** project provides an easy way to build AmigaOS 3.x (m68k) target toolchain in a Unix-like environment.
 
 Build process should produce following set of tools for **m68k-amigaos** target:
 
- * gcc 2.95.3
- * g++ 2.95.3
- * libstdc++ 2.10
- * binutils 2.9.1 (assembler, linker, etc.)
+ * gcc 6 (recent version vom gcc-6-branch) **[default]**
+ * binutils 2.14 (assembler, linker, etc.) - patched to work with gcc6 **[default]**
  * libnix 2.2 (standard ANSI/C library replacement for AmigaOS)
  * libm 5.4 (provides math library implementation for non-FPU Amigas)
  * AmigaOS headers & libraries & autodocs (for AmigaOS 3.9)
+
+... also yet present is:
+
+ * binutils 2.9.1 (assembler, linker, etc.)
  * vbcc toolchain (most recent release) including vasm, vlink and C standard library
  * IRA: portable M68000/010/020/030/040 reassembler for AmigaOS hunk-format
    executables, libraries, devices and raw binary files
@@ -39,14 +45,23 @@ Build process should produce following set of tools for **m68k-amigaos** target:
 
 **Note:** *Patches are welcome!*
 
+### Commits
+I am using funny symbols in my commits:
+
+ * @B : this is a bug fix
+ * @S : <submodule(s)> look into the submodule(s) [Maybe more text]
+ * @R : redesign or change which affects other files (e.g. changing a header)
+ * @I : internal redesign
+ * @D : debugging related changes
+ * @C : comments added / remove / changed
+
+
 ### Downloads
 
 There are no binary downloads provided for the time being. I do as much as possible to make the toolchain portable among Unix-like environments. Following platforms were tested and the toolchain is known to work for them:
 
- * Windows 7 SP1 32-bit (MSYS2 2.6.0, gcc 5.3.0)
+ * Windows 10 64-bit with Cygwin 32bit.
  * Ubuntu 16.04 LTS 32-bit (gcc 5.4.0)
- * Ubuntu 16.04 LTS 64-bit (gcc 5.4.0) *Requires gcc-multilib package, and i386 libraries!*
- * MacOS X 10.9.5 (MacPorts - Apple's clang-600.0.57)
  
 ### Documentation
 
@@ -94,7 +109,7 @@ Follow steps listed below:
 1. Fetch *amigaos-cross-toolchain* project to your local drive:  
 
     ```
-# git clone git://github.com/cahirwpz/amigaos-cross-toolchain.git
+# git clone git://github.com/bebbo/amigaos-cross-toolchain.git
 # cd amigaos-cross-toolchain
 ```
 
@@ -104,7 +119,9 @@ Follow steps listed below:
 # ./toolchain-m68k --prefix=/opt/m68k-amigaos build
 ```
 
-3. Wait for the result :-)
+I also suggest to use the option **--threads <n>** to speedup your build.
+
+3. Restart on error and wait for the results :-)
 
 4. *(optional)* Install additional SDKs (e.g. AHI, CyberGraphX, Magic User Interface, etc.):
 

@@ -30,7 +30,7 @@ hello-stdio.clib2: hello-stdio.c
 	$(CC) -mcrt=clib2 -m68020 $(CFLAGS) -o $@ $<
 
 hello-iostream: hello-iostream.cpp
-	$(CXX) -noixemul -m68020 $(CXXFLAGS) -o $@ $^
+	$(CXX) -noixemul -m68020 $(CXXFLAGS) -o $@ $^ -Xlinker --allow-multiple-definition
 
 test-ctors: test-ctors.cpp
 	$(CXX) -noixemul -m68020 $(CXXFLAGS) -D__A -c -o test-ctors-a.o $<

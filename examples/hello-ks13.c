@@ -9,7 +9,7 @@ int __initlibraries = 0;
 struct DosLibrary *DOSBase = NULL;
 
 int main() {
-  if ((DOSBase = (struct DosLibrary *) OpenLibrary("dos.library", 34))) {
+  if ((DOSBase = (struct DosLibrary *) OpenLibrary((UBYTE*)"dos.library", 34))) {
     Write(Output(), "Hello world!\n", 13);
     CloseLibrary((struct Library *)DOSBase);
   }
