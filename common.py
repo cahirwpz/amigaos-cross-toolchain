@@ -397,7 +397,6 @@ def pysetup(name, **kwargs):
   prefix = kwargs.get('prefix', '{prefix}')
   with env(PYTHONPATH=extend_pythonpath(prefix)):
     with cwd(path.join('{build}', name)):
-      mkdir(SITEDIR)
       execute('{python}', 'setup.py', 'build')
       execute('{python}', 'setup.py', 'install', '--prefix=' + prefix)
 
