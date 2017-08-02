@@ -380,7 +380,7 @@ def recipe(name, nargs=0):
 def extend_pythonpath(prefix):
   SITEDIR = path.join(prefix, '{sitedir}')
   try:
-    return ':'.join(os.environ['PYTHONPATH'], SITEDIR)
+    return ':'.join([os.environ['PYTHONPATH'], SITEDIR])
   except KeyError:
     return SITEDIR
 
@@ -388,6 +388,7 @@ def extend_pythonpath(prefix):
 @recipe('pyinstall', 1)
 def pyinstall(name, **kwargs):
   prefix = kwargs.get('prefix', '{prefix}')
+  mkdir(path.join(prefix, '{sitedir}'))
   with env(PYTHONPATH=extend_pythonpath(prefix)):
     execute('{python}', '-m', 'easy_install', '--prefix=' + prefix, name)
 
@@ -395,6 +396,7 @@ def pyinstall(name, **kwargs):
 @recipe('pysetup', 1)
 def pysetup(name, **kwargs):
   prefix = kwargs.get('prefix', '{prefix}')
+  mkdir(path.join(prefix, '{sitedir}'))
   with env(PYTHONPATH=extend_pythonpath(prefix)):
     with cwd(path.join('{build}', name)):
       execute('{python}', 'setup.py', 'build')

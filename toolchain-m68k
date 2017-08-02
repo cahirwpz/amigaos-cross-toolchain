@@ -132,7 +132,7 @@ def fix_amitools():
 
   for tool in ['fdtool', 'geotool', 'hunktool', 'rdbtool', 'romtool',
           'typetool', 'vamos', 'vamospath', 'xdfscan', 'xdftool']:
-    fix_python_shebang('{prefix}/bin/' + tool, '{prefix}')
+    fix_python_shebang(path.join('{prefix}', 'bin', tool), '{prefix}')
 
 
 @recipe('{libamiga}-install')
@@ -283,7 +283,7 @@ def build():
   execute('git', 'submodule', 'init');
   execute('git', 'submodule', 'update');
 
-  add_site_dir('{host}')
+  add_site_dir('{prefix}')
 
   """
   Make sure we always choose known compiler (from the distro) and not one in
@@ -525,11 +525,12 @@ def build():
 
   install_tools()
 
-  pyinstall('cython')
+  pyinstall('cython', prefix='{host}')
   fix_cython()
 
   unpack('amitools', work_dir='{build}')
-  pysetup('amitools')
+  with env(PYTHONPATH=path.join('{host}', '{sitedir}')):
+    pysetup('amitools')
   fix_amitools()
 
 
