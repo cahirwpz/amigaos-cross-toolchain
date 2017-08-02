@@ -28,3 +28,6 @@
 [submodule "submodules/binutils-2.14"]
 	path = submodules/binutils-2.14
 	url = https://github.com/adtools/amigaos-binutils-2.14.git
+[submodule "submodules/amitools"]
+	path = submodules/amitools
+	url = https://github.com/cnvogelg/amitools

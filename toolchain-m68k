@@ -118,6 +118,23 @@ def install_tools():
   copy('{build}/vdam68k/vda68k', '{prefix}/bin')
 
 
+@recipe('cython-fix')
+def fix_cython():
+  info('fixing cython')
+
+  for script in ['cygdb', 'cython', 'cythonize']:
+    fix_python_shebang(path.join('{host}', 'bin', script), '{host}')
+
+
+@recipe('amitools-fix')
+def fix_amitools():
+  info('fixing amitools')
+
+  for tool in ['fdtool', 'geotool', 'hunktool', 'rdbtool', 'romtool',
+          'typetool', 'vamos', 'vamospath', 'xdfscan', 'xdftool']:
+    fix_python_shebang('{prefix}/bin/' + tool, '{prefix}')
+
+
 @recipe('{libamiga}-install')
 def install_libamiga():
   info('installing libamiga')
@@ -318,7 +335,7 @@ def build():
   require_header([path.join(py_ver, 'Python.h')],
                  lang='c', errmsg='python-dev package missing')
   unpack('python-lha', work_dir='{build}')
-  python_setup('python-lha')
+  pysetup('python-lha', prefix='{prefix}')
 
   unpack('{m4}')
   configure('{m4}', '--prefix={host}')
@@ -508,6 +525,13 @@ def build():
 
   install_tools()
 
+  pyinstall('cython')
+  fix_cython()
+
+  unpack('amitools', work_dir='{build}')
+  pysetup('amitools')
+  fix_amitools()
+
 
 def clean():
   rmtree('{stamps}')
@@ -654,7 +678,7 @@ def install_sdk(*names):
                               path.join('{host}', 'bin'),
                               environ['PATH']])
 
-  add_site_dir('{host}')
+  add_site_dir('{prefix}')
 
   with cwd('{prefix}/{target}'):
     mkdir('doc', 'guide', 'include/proto', 'include/inline', 'include/lvo',
@@ -727,7 +751,8 @@ if __name__ == "__main__":
 
   setvar(top=path.abspath(path.dirname(sys.argv[0])),
          binutils_ver=args.binutils,
-         gcc_ver=args.gcc)
+         gcc_ver=args.gcc,
+         py_ver='python%d.%d' % (sys.version_info.major, sys.version_info.minor))
 
   setvar(m4='m4-1.4.17',
          gawk='gawk-3.1.8',
@@ -747,6 +772,8 @@ if __name__ == "__main__":
          gcc='gcc-{gcc_ver}',
          gpp='g++-{gcc_ver}',
          target='m68k-amigaos',
+         python=sys.executable,
+         sitedir=path.join('lib', '{py_ver}', 'site-packages'),
          patches=path.join('{top}', 'patches'),
          stamps=path.join('{top}', '.build-m68k', 'stamps'),
          build=path.join('{top}', '.build-m68k', 'build'),
