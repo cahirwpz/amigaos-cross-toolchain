@@ -118,23 +118,6 @@ def install_tools():
   copy('{build}/vdam68k/vda68k', '{prefix}/bin')
 
 
-@recipe('cython-fix')
-def fix_cython():
-  info('fixing cython')
-
-  for script in ['cygdb', 'cython', 'cythonize']:
-    fix_python_shebang(path.join('{host}', 'bin', script), '{host}')
-
-
-@recipe('amitools-fix')
-def fix_amitools():
-  info('fixing amitools')
-
-  for tool in ['fdtool', 'geotool', 'hunktool', 'rdbtool', 'romtool',
-          'typetool', 'vamos', 'vamospath', 'xdfscan', 'xdftool']:
-    fix_python_shebang(path.join('{prefix}', 'bin', tool), '{prefix}')
-
-
 @recipe('{libamiga}-install')
 def install_libamiga():
   info('installing libamiga')
@@ -334,8 +317,11 @@ def build():
   py_ver = 'python%d.%d' % (sys.version_info.major, sys.version_info.minor)
   require_header([path.join(py_ver, 'Python.h')],
                  lang='c', errmsg='python-dev package missing')
+  pyinstall('pip', prefix='{host}')
+  pyfixbin('pip', ['pip'], prefix='{host}')
+
   unpack('python-lha', work_dir='{build}')
-  pysetup('python-lha', prefix='{prefix}')
+  pysetup('python-lha')
 
   unpack('{m4}')
   configure('{m4}', '--prefix={host}')
@@ -525,9 +511,9 @@ def build():
 
   install_tools()
 
-  unpack('amitools', work_dir='{build}')
-  pysetup('amitools')
-  fix_amitools()
+  pypip('amitools')
+  pyfixbin('amitools', ['fdtool', 'geotool', 'hunktool', 'rdbtool', 'romtool',
+                        'typetool', 'vamos', 'vamospath', 'xdfscan', 'xdftool'])
 
 
 def clean():

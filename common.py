@@ -392,6 +392,12 @@ def pyinstall(name, **kwargs):
   with env(PYTHONPATH=extend_pythonpath(prefix)):
     execute('{python}', '-m', 'easy_install', '--prefix=' + prefix, name)
 
+@recipe('pyfixbin', 1)
+def pyfixbin(name, names, **kwargs):
+  prefix = kwargs.get('prefix', '{prefix}')
+  for name in names:
+    fix_python_shebang(path.join(prefix, 'bin', name), prefix)
+
 
 @recipe('pysetup', 1)
 def pysetup(name, **kwargs):
@@ -401,6 +407,15 @@ def pysetup(name, **kwargs):
     with cwd(path.join('{build}', name)):
       execute('{python}', 'setup.py', 'build')
       execute('{python}', 'setup.py', 'install', '--prefix=' + prefix)
+
+
+@recipe('pypip', 1)
+def pypip(name, **kwargs):
+  prefix = kwargs.get('prefix', '{prefix}')
+  mkdir(path.join(prefix, '{sitedir}'))
+  with env(PYTHONPATH=extend_pythonpath(prefix)):
+    with cwd(path.join('{build}', name)):
+      execute('pip', 'install', '--prefix=' + prefix, name)
 
 
 @recipe('fetch', 1)
@@ -534,4 +549,4 @@ __all__ = ['setvar', 'panic', 'cmpver', 'find_executable', 'chmod', 'execute',
            'symlink', 'remove', 'move', 'find', 'textfile', 'env', 'path',
            'add_site_dir', 'find_site_dir', 'pysetup', 'pyinstall', 'recipe',
            'unpack', 'patch', 'configure', 'make', 'require_header', 'touch',
-           'fix_python_shebang']
+           'pypip', 'pyfixbin']
