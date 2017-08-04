@@ -319,10 +319,6 @@ def build():
   unpack('python-lha', work_dir='{build}')
   pysetup('python-lha')
 
-  pyinstall('amitools')
-  pyfixbin('amitools', ['fdtool', 'geotool', 'hunktool', 'rdbtool', 'romtool',
-                        'typetool', 'vamos', 'vamospath', 'xdfscan', 'xdftool'])
-
   unpack('{automake}')
 
   unpack('{m4}')
@@ -512,6 +508,10 @@ def build():
   make('vdam68k')
 
   install_tools()
+
+  pyinstall('amitools')
+  pyfixbin('amitools', ['fdtool', 'geotool', 'hunktool', 'rdbtool', 'romtool',
+                        'typetool', 'vamos', 'vamospath', 'xdfscan', 'xdftool'])
 
 
 def clean():
