@@ -525,12 +525,8 @@ def build():
 
   install_tools()
 
-  pyinstall('cython', prefix='{host}')
-  fix_cython()
-
   unpack('amitools', work_dir='{build}')
-  with env(PYTHONPATH=path.join('{host}', '{sitedir}')):
-    pysetup('amitools')
+  pysetup('amitools')
   fix_amitools()
 
 
