@@ -312,16 +312,18 @@ def build():
   require_header(['ncurses.h', 'ncurses/ncurses.h'],
                  lang='c', errmsg='libncurses-dev package missing')
 
-  unpack('{automake}')
-
   py_ver = 'python%d.%d' % (sys.version_info.major, sys.version_info.minor)
   require_header([path.join(py_ver, 'Python.h')],
                  lang='c', errmsg='python-dev package missing')
-  pyinstall('pip', prefix='{host}')
-  pyfixbin('pip', ['pip'], prefix='{host}')
 
   unpack('python-lha', work_dir='{build}')
   pysetup('python-lha')
+
+  pyinstall('amitools')
+  pyfixbin('amitools', ['fdtool', 'geotool', 'hunktool', 'rdbtool', 'romtool',
+                        'typetool', 'vamos', 'vamospath', 'xdfscan', 'xdftool'])
+
+  unpack('{automake}')
 
   unpack('{m4}')
   configure('{m4}', '--prefix={host}')
@@ -510,10 +512,6 @@ def build():
   make('vdam68k')
 
   install_tools()
-
-  pypip('amitools')
-  pyfixbin('amitools', ['fdtool', 'geotool', 'hunktool', 'rdbtool', 'romtool',
-                        'typetool', 'vamos', 'vamospath', 'xdfscan', 'xdftool'])
 
 
 def clean():

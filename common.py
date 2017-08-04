@@ -409,15 +409,6 @@ def pysetup(name, **kwargs):
       execute('{python}', 'setup.py', 'install', '--prefix=' + prefix)
 
 
-@recipe('pypip', 1)
-def pypip(name, **kwargs):
-  prefix = kwargs.get('prefix', '{prefix}')
-  mkdir(path.join(prefix, '{sitedir}'))
-  with env(PYTHONPATH=extend_pythonpath(prefix)):
-    with cwd(path.join('{build}', name)):
-      execute('pip', 'install', '--prefix=' + prefix, name)
-
-
 @recipe('fetch', 1)
 def fetch(name, url):
   if url.startswith('http') or url.startswith('ftp'):
@@ -549,4 +540,4 @@ __all__ = ['setvar', 'panic', 'cmpver', 'find_executable', 'chmod', 'execute',
            'symlink', 'remove', 'move', 'find', 'textfile', 'env', 'path',
            'add_site_dir', 'find_site_dir', 'pysetup', 'pyinstall', 'recipe',
            'unpack', 'patch', 'configure', 'make', 'require_header', 'touch',
-           'pypip', 'pyfixbin']
+           'pyfixbin']
