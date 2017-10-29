@@ -41,7 +41,7 @@ def update_autotools(dst):
 def prepare_sdk():
   info('preparing {sdk}')
 
-  target = path.join('{target}', 'ppc-amigaos/SDK')
+  target = path.join('{prefix}', 'ppc-amigaos/SDK')
 
   unpack('{sdk}', work_dir='{archives}', top_dir='SDK_Install', dst_dir='SDK')
   unpack('SDK/base', top_dir='Include', dst_dir=path.join(target, 'include'))
@@ -72,7 +72,7 @@ def build():
   find_executable('make')
   find_executable('svn')
 
-  environ['PATH'] = ":".join([path.join('{target}', 'bin'),
+  environ['PATH'] = ":".join([path.join('{prefix}', 'bin'),
                               path.join('{host}', 'bin'),
                               environ['PATH']])
 
@@ -150,7 +150,7 @@ def build():
   with env(CFLAGS='-Wno-error'):
     update_autotools('{archives}/{binutils}')
     configure('{binutils}',
-              '--prefix={target}',
+              '--prefix={prefix}',
               '--target=ppc-amigaos',
               from_dir='{archives}/{binutils}')
     make('{binutils}')
@@ -167,7 +167,7 @@ def build():
   update_autotools('{archives}/{gcc}')
   with env(**gcc_env):
     configure('{gcc}',
-              '--prefix={target}',
+              '--prefix={prefix}',
               '--target=ppc-amigaos',
               '--with-bugurl="http://sf.net/p/adtools"',
               '--with-gmp={host}',
@@ -221,7 +221,8 @@ if __name__ == "__main__":
 
   setvar(top=path.abspath(path.dirname(sys.argv[0])),
          binutils_ver=args.binutils,
-         gcc_ver=args.gcc)
+         gcc_ver=args.gcc,
+         py_ver='python%d.%d' % (sys.version_info.major, sys.version_info.minor))
 
   setvar(gmp='gmp-5.1.3',
          mpfr='mpfr-3.1.3',
@@ -233,21 +234,23 @@ if __name__ == "__main__":
          binutils='binutils-{binutils_ver}',
          sdk='SDK_53.24',
          gcc='gcc-{gcc_ver}',
+         python=sys.executable,
+         sitedir=path.join('lib', '{py_ver}', 'site-packages'),
          patches=path.join('{top}', 'patches'),
          stamps=path.join('{top}', '.build-ppc', 'stamps'),
          build=path.join('{top}', '.build-ppc', 'build'),
          sources=path.join('{top}', '.build-ppc', 'sources'),
          host=path.join('{top}', '.build-ppc', 'host'),
          tmpdir=path.join('{top}', '.build-ppc', 'tmpdir'),
-         target=path.join('{top}', 'ppc-amigaos'),
+         prefix=path.join('{top}', 'ppc-amigaos'),
          archives=path.join('{top}', '.build-ppc', 'archives'),
          submodules=path.join('{top}', 'submodules'))
 
   if args.prefix is not None:
-    setvar(target=args.prefix)
+    setvar(prefix=args.prefix)
 
-  if not path.exists('{target}'):
-    mkdir('{target}')
+  if not path.exists('{prefix}'):
+    mkdir('{prefix}')
 
   action = args.action.replace('-', '_')
   globals()[action].__call__(*args.args)
