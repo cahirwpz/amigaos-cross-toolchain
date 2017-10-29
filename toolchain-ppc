@@ -58,6 +58,10 @@ def fetch_all():
         url, name = url[0], url[1]
       else:
         name = path.basename(url)
+      if 'gcc' in name and args.gcc not in name:
+        continue
+      if 'binutils' in name and args.binutils not in name:
+        continue
       fetch(name, url)
 
 
