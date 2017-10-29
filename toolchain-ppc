@@ -51,6 +51,16 @@ def prepare_sdk():
   unpack('SDK/pthread', top_dir='Local', dst_dir=target)
 
 
+def fetch_all():
+  with cwd('{archives}'):
+    for url in URLS:
+      if type(url) == tuple:
+        url, name = url[0], url[1]
+      else:
+        name = path.basename(url)
+      fetch(name, url)
+
+
 def build():
   for var in environ.keys():
     if var not in ['_', 'LOGNAME', 'HOME', 'SHELL', 'TMPDIR', 'PWD']:
@@ -80,13 +90,7 @@ def build():
 
   add_site_dir('{host}')
 
-  with cwd('{archives}'):
-    for url in URLS:
-      if type(url) == tuple:
-        url, name = url[0], url[1]
-      else:
-        name = path.basename(url)
-      fetch(name, url)
+  fetch_all()
 
   require_header(['ncurses.h', 'ncurses/ncurses.h'],
                  lang='c', errmsg='libncurses-dev package missing')
@@ -212,7 +216,7 @@ if __name__ == "__main__":
 
   parser = argparse.ArgumentParser(description='Build cross toolchain.')
   parser.add_argument('action',
-                      choices=['build', 'clean'],
+                      choices=['build', 'clean', 'fetch-all'],
                       default='build', help='perform action')
   parser.add_argument('args', metavar='ARGS', type=str, nargs='*',
                       help='action arguments')
