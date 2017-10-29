@@ -48,6 +48,7 @@ def prepare_sdk():
   unpack('SDK/base', top_dir='Include', dst_dir=path.join(target, 'include'))
   unpack('SDK/clib2', top_dir='clib2', dst_dir=path.join(target, 'clib2'))
   unpack('SDK/newlib', top_dir='newlib', dst_dir=path.join(target, 'newlib'))
+  unpack('SDK/pthread', top_dir='Local', dst_dir=target)
 
 
 def build():
