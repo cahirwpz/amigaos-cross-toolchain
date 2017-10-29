@@ -9,6 +9,7 @@ from os import path
 import contextlib
 from distutils import spawn, sysconfig
 import fileinput
+import multiprocessing
 import os
 import shutil
 import site
@@ -502,6 +503,7 @@ def make(name, target=None, makefile=None, **makevars):
       args = [target] + args
     if makefile is not None:
       args = ['-f', makefile] + args
+    args = ['-j%d' % multiprocessing.cpu_count()] + args
     execute('make', *args)
 
 
