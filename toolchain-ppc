@@ -88,13 +88,16 @@ def build():
         name = path.basename(url)
       fetch(name, url)
 
-  unpack('{automake}')
+  require_header(['ncurses.h', 'ncurses/ncurses.h'],
+                 lang='c', errmsg='libncurses-dev package missing')
 
   py_ver = 'python%d.%d' % (sys.version_info.major, sys.version_info.minor)
   require_header([path.join(py_ver, 'Python.h')],
                  lang='c', errmsg='python-dev package missing')
   unpack('{python_lhafile}', work_dir='{build}')
   pysetup('{python_lhafile}', prefix='/usr/local')
+
+  unpack('{automake}')
 
   unpack('{texinfo}')
   update_autotools('{sources}/{texinfo}/build-aux')
