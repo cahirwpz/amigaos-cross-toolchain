@@ -48,6 +48,16 @@ def prepare_sdk():
   unpack('SDK/newlib', top_dir='newlib', dst_dir=path.join(target, 'newlib'))
 
 
+def download():
+  with cwd('{archives}'):
+    for url in URLS:
+      if type(url) == tuple:
+        url, name = url[0], url[1]
+      else:
+        name = path.basename(url)
+      fetch(name, url)
+
+
 def build():
   for var in environ.keys():
     if var not in ['_', 'LOGNAME', 'HOME', 'SHELL', 'TMPDIR', 'PWD']:
@@ -107,13 +117,7 @@ def build():
   unpack('python-lha', work_dir='{build}')
   pysetup('python-lha')
 
-  with cwd('{archives}'):
-    for url in URLS:
-      if type(url) == tuple:
-        url, name = url[0], url[1]
-      else:
-        name = path.basename(url)
-      fetch(name, url)
+  download()
 
   unpack('{automake}')
 
