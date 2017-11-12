@@ -180,7 +180,7 @@ def build():
               '--prefix={prefix}',
               '--target={target}',
               from_dir='{archives}/{binutils}')
-    make('{binutils}', parallel=True)
+    make('{binutils}')
     make('{binutils}', 'install')
 
   prepare_sdk()
