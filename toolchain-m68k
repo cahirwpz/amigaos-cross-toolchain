@@ -325,13 +325,13 @@ def build():
 
   unpack('{m4}')
   configure('{m4}', '--prefix={host}')
-  make('{m4}')
+  make('{m4}', parallel=True)
   make('{m4}', 'install')
 
   unpack('{gawk}')
   update_autotools('{sources}/{gawk}')
   configure('{gawk}', '--prefix={host}')
-  make('{gawk}')
+  make('{gawk}', parallel=True)
   make('{gawk}', 'install')
 
   unpack('{flex}')
@@ -342,19 +342,19 @@ def build():
   unpack('{bison}')
   update_autotools('{sources}/{bison}/config')
   configure('{bison}', '--prefix={host}')
-  make('{bison}')
+  make('{bison}', parallel=True)
   make('{bison}', 'install')
 
   unpack('{texinfo}')
   update_autotools('{sources}/{texinfo}/build-aux')
   configure('{texinfo}', '--prefix={host}')
-  make('{texinfo}')
+  make('{texinfo}', parallel=True)
   make('{texinfo}', 'install')
 
   unpack('{autoconf}')
   update_autotools('{sources}/{autoconf}')
   configure('{autoconf}', '--prefix={host}')
-  make('{autoconf}')
+  make('{autoconf}', parallel=True)
   make('{autoconf}', 'install')
 
   prepare_target()
@@ -418,7 +418,7 @@ def build():
               '--target=m68k-amigaos',
               from_dir='{submodules}/{binutils}')
     touch_genfiles('{submodules}/{binutils}')
-    make('{binutils}')
+    make('{binutils}', parallel=True)
     make('{binutils}', 'install-binutils')
     make('{binutils}', 'install-gas')
     make('{binutils}', 'install-ld')
@@ -442,7 +442,7 @@ def build():
     touch_genfiles('{submodules}/{gcc}')
     touch('{submodules}/{gcc}/gcc/c-parse.gperf')
     touch('{submodules}/{gcc}/gcc/configure')
-    make('{gcc}', 'all-gcc',
+    make('{gcc}', 'all-gcc', parallel=True,
          MAKEINFO='makeinfo', CFLAGS_FOR_TARGET='-noixemul')
     make('{gcc}', 'install-gcc',
          MAKEINFO='makeinfo', CFLAGS_FOR_TARGET='-noixemul')
@@ -493,11 +493,11 @@ def build():
   make('{libdebug}', 'install')
 
   unpack('{clib2}', work_dir='{build}', top_dir='library')
-  make('{clib2}', makefile='GNUmakefile.68k')
+  make('{clib2}', makefile='GNUmakefile.68k', parallel=True)
   install_clib2()
 
   with env(CC=CC, CXX=CXX, CFLAGS=FLAGS, CXXFLAGS=FLAGS):
-    make('{gcc}', 'all-target',
+    make('{gcc}', 'all-target', parallel=True,
          MAKEINFO='makeinfo', CFLAGS_FOR_TARGET='-noixemul')
     make('{gcc}', 'install-target',
          MAKEINFO='makeinfo', CFLAGS_FOR_TARGET='-noixemul')

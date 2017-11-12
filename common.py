@@ -10,6 +10,7 @@ import contextlib
 from distutils import spawn, sysconfig
 import fileinput
 import os
+from multiprocessing import cpu_count
 import shutil
 import site
 import subprocess
@@ -20,6 +21,9 @@ import urllib2
 import zipfile
 
 VARS = {}
+
+
+print('System has %d cores!' % cpu_count())
 
 
 def setvar(**kwargs):
@@ -489,7 +493,7 @@ def configure(name, *confopts, **kwargs):
 
 
 @recipe('make', 2)
-def make(name, target=None, makefile=None, **makevars):
+def make(name, target=None, makefile=None, parallel=False, **makevars):
   info('running make "%s"', target)
 
   with cwd(path.join('{build}', name)):
@@ -498,6 +502,8 @@ def make(name, target=None, makefile=None, **makevars):
       args = [target] + args
     if makefile is not None:
       args = ['-f', makefile] + args
+    if parallel:
+      args = ['-j%d' % cpu_count()] + args
     execute('make', *args)
 
 
