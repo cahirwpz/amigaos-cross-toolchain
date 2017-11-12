@@ -234,7 +234,7 @@ if __name__ == "__main__":
 
   parser = argparse.ArgumentParser(description='Build cross toolchain.')
   parser.add_argument('action',
-                      choices=['build', 'clean'],
+                      choices=['build', 'clean', 'download'],
                       default='build', help='perform action')
   parser.add_argument('args', metavar='ARGS', type=str, nargs='*',
                       help='action arguments')
