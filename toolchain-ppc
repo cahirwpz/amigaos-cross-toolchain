@@ -121,11 +121,10 @@ def build():
 
   unpack('{automake}')
 
-
   unpack('{texinfo}')
   update_autotools('{sources}/{texinfo}/build-aux')
   configure('{texinfo}', '--prefix={host}')
-  make('{texinfo}')
+  make('{texinfo}', parallel=True)
   make('{texinfo}', 'install')
 
   unpack('{gmp}')
@@ -133,7 +132,7 @@ def build():
   configure('{gmp}',
             '--disable-shared',
             '--prefix={host}')
-  make('{gmp}')
+  make('{gmp}', parallel=True)
   make('{gmp}', 'install')
 
   unpack('{mpfr}')
@@ -142,7 +141,7 @@ def build():
             '--disable-shared',
             '--prefix={host}',
             '--with-gmp={host}')
-  make('{mpfr}')
+  make('{mpfr}', parallel=True)
   make('{mpfr}', 'install')
 
   unpack('{mpc}')
@@ -152,7 +151,7 @@ def build():
             '--prefix={host}',
             '--with-gmp={host}',
             '--with-mpfr={host}')
-  make('{mpc}')
+  make('{mpc}', parallel=True)
   make('{mpc}', 'install')
 
   unpack('{isl}')
@@ -161,7 +160,7 @@ def build():
             '--disable-shared',
             '--prefix={host}',
             '--with-gmp-prefix={host}')
-  make('{isl}')
+  make('{isl}', parallel=True)
   make('{isl}', 'install')
 
   unpack('{cloog}')
@@ -172,7 +171,7 @@ def build():
             '--with-isl=system',
             '--with-gmp-prefix={host}',
             '--with-isl-prefix={host}')
-  make('{cloog}')
+  make('{cloog}', parallel=True)
   make('{cloog}', 'install')
 
   with env(CFLAGS='-Wno-error'):
@@ -181,7 +180,7 @@ def build():
               '--prefix={prefix}',
               '--target={target}',
               from_dir='{archives}/{binutils}')
-    make('{binutils}')
+    make('{binutils}', parallel=True)
     make('{binutils}', 'install')
 
   prepare_sdk()
@@ -208,7 +207,7 @@ def build():
               '--disable-libstdcxx-pch',
               '--disable-tls',
               from_dir='{archives}/{gcc}')
-  make('{gcc}')
+  make('{gcc}', parallel=True)
   make('{gcc}', 'install')
 
 
