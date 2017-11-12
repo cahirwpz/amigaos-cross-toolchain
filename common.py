@@ -417,7 +417,7 @@ def fetch(name, url):
     else:
       info('File "%s" already downloaded.', name)
   elif url.startswith('svn'):
-    execute('svn', 'export', url, name)
+    execute('svn', 'export', '--quiet', url, name)
   elif url.startswith('git'):
     if not path.exists(name):
       execute('git', 'clone', url, name)

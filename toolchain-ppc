@@ -102,6 +102,9 @@ def build():
   require_header([path.join(py_ver, 'Python.h')],
                  lang='c', errmsg='python-dev package missing')
 
+  unpack('python-lha', work_dir='{build}')
+  pysetup('python-lha')
+
   with cwd('{archives}'):
     for url in URLS:
       if type(url) == tuple:
@@ -109,10 +112,6 @@ def build():
       else:
         name = path.basename(url)
       fetch(name, url)
-
-
-  unpack('python-lha', work_dir='{build}')
-  pysetup('python-lha')
 
   unpack('{automake}')
 
