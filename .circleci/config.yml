@@ -42,7 +42,7 @@ jobs:
       - save_cache:
           key: ppc-cache-{{ .Branch }}-{{ checksum ".circleci/DATESTAMP" }}
           paths:
-            - .build-m68k
+            - .build-ppc
       - run: './toolchain-ppc --quiet build'
       - save_cache:
           key: ppc-amigaos-{{ .Branch }}-{{ .Revision }}
