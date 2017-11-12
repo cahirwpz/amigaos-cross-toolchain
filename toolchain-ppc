@@ -102,6 +102,8 @@ def build():
   require_header([path.join(py_ver, 'Python.h')],
                  lang='c', errmsg='python-dev package missing')
 
+  execute('git', 'submodule', 'init', 'submodules/python-lhafile');
+  execute('git', 'submodule', 'update', 'submodules/python-lhafile');
   unpack('python-lha', work_dir='{build}')
   pysetup('python-lha')
 
