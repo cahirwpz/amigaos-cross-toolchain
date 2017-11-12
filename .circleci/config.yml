@@ -52,8 +52,8 @@ workflows:
   version: 2
   amigaos-cross-toolchain:
     jobs:
-      # - m68k
+      - m68k
       - powerpc
-      # - m68k-tests:
-      #     requires:
-      #       - m68k
+      - m68k-tests:
+          requires:
+            - m68k
