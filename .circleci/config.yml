@@ -3,14 +3,13 @@ version: 2
 defaults: &defaults
   working_directory: ~/amigaos-cross-toolchain
   docker:
-    - image: debian:jessie
+    - image: cahirwpz/amigaos-cross-toolchain-buildenv:latest
 
 jobs:
   m68k_amigaos:
     <<: *defaults
     steps:
       - checkout
-      - run: 'apt-get install -y gperf gcc-multilib'
       - run: './toolchain-m68k --quiet build'
       - store_artifacts:
           path: m68k-amigaos
