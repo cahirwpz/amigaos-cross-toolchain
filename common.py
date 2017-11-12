@@ -23,9 +23,6 @@ import zipfile
 VARS = {}
 
 
-print('System has %d cores!' % cpu_count())
-
-
 def setvar(**kwargs):
   for key, item in kwargs.items():
     VARS[key] = item.format(**VARS)
