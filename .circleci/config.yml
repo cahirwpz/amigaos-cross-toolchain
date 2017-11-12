@@ -6,7 +6,7 @@ defaults: &defaults
     - image: cahirwpz/amigaos-cross-toolchain-buildenv:latest
 
 jobs:
-  m68k_amigaos:
+  m68k:
     <<: *defaults
     steps:
       - checkout
@@ -17,7 +17,7 @@ jobs:
           key: m68k-amigaos-{{ .Branch }}-{{ .Revision }}
           paths: m68k-amigaos
 
-  m68k_amigaos_tests:
+  m68k-tests:
     <<: *defaults
     steps:
       - checkout
@@ -27,9 +27,9 @@ jobs:
 
 workflows:
   version: 2
-  build_and_test:
+  amigaos-cross-toolchain:
     jobs:
-      - m68k_amigaos
-      - m68k_amigaos_tests:
+      - m68k
+      - m68k-tests:
           requires:
-            - m68k_amigaos
+            - m68k
