@@ -1,0 +1,35 @@
+version: 2
+
+defaults: &defaults
+  working_directory: ~/amigaos-cross-toolchain
+  docker:
+    - image: debian:jessie
+
+jobs:
+  m68k-amigaos:
+    <<: *defaults
+    steps:
+      - checkout
+      - run: 'apt-get install -y gperf gcc-multilib'
+      - run: './toolchain-m68k --quiet build'
+      - store_artifacts:
+          path: m68k-amigaos
+      - save_cache:
+          key: m68k-amigaos-{{ .Branch }}-{{ .Revision }}
+
+  m68k_amigaos_tests:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          key: m68k-amigaos-{{ .Branch }}-{{ .Revision }}
+      - run: './toolchain-m68k --quiet test'
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - m68k_amigaos
+      - m68k_amigaos_tests:
+          requires:
+            - m68k_amigaos
