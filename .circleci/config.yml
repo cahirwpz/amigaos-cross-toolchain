@@ -16,6 +16,7 @@ jobs:
           path: m68k-amigaos
       - save_cache:
           key: m68k-amigaos-{{ .Branch }}-{{ .Revision }}
+          paths: m68k-amigaos
 
   m68k_amigaos_tests:
     <<: *defaults
