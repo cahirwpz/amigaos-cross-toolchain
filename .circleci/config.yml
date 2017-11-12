@@ -16,8 +16,8 @@ jobs:
       - run: './toolchain-m68k --quiet download'
       - save_cache:
           key: m68k-cache-{{ .Branch }}-{{ checksum ".circleci/DATESTAMP" }}
-            paths:
-              - .build-m68k
+          paths:
+            - .build-m68k
       - run: './toolchain-m68k --quiet build'
       - store_artifacts:
           path: m68k-amigaos
