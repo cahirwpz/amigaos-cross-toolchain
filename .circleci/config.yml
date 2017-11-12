@@ -6,7 +6,7 @@ defaults: &defaults
     - image: debian:jessie
 
 jobs:
-  m68k-amigaos:
+  m68k_amigaos:
     <<: *defaults
     steps:
       - checkout
