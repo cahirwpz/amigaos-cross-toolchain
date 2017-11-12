@@ -9,6 +9,7 @@ from os import path
 import contextlib
 from distutils import spawn, sysconfig
 import fileinput
+import multiprocessing
 import os
 import shutil
 import site
@@ -411,17 +412,13 @@ def pysetup(name, **kwargs):
 
 @recipe('fetch', 1)
 def fetch(name, url):
-  if url.startswith('http') or url.startswith('ftp'):
+  if 'svn' in url:
+    execute('svn', 'export', url, name)
+  elif url.startswith('http') or url.startswith('ftp'):
     if not path.exists(name):
       download(url, name)
     else:
       info('File "%s" already downloaded.', name)
-  elif url.startswith('svn'):
-    if not path.exists(name):
-      execute('svn', 'checkout', url, name)
-    else:
-      with cwd(name):
-        execute('svn', 'update')
   elif url.startswith('git'):
     if not path.exists(name):
       execute('git', 'clone', url, name)
@@ -502,6 +499,7 @@ def make(name, target=None, makefile=None, **makevars):
       args = [target] + args
     if makefile is not None:
       args = ['-f', makefile] + args
+    args = ['-j%d' % multiprocessing.cpu_count()] + args
     execute('make', *args)
 
 
