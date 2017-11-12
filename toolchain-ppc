@@ -207,7 +207,7 @@ def build():
               '--disable-libstdcxx-pch',
               '--disable-tls',
               from_dir='{archives}/{gcc}')
-  make('{gcc}', parallel=True)
+  make('{gcc}')
   make('{gcc}', 'install')
 
 
